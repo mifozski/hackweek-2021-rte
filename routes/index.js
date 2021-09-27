@@ -6,4 +6,8 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
+router.post('/rteCallback', function(req, res, next) {
+  console.error(req)
+});
+
 module.exports = router;
