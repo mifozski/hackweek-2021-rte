@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "start": "concurrently \"npm run start_micro\" \"npm run start_rte\"",
     "start_micro": "node ./bin/www",
     "start_rte": "cross-env CALLBACK_URL=http://localhost:3000/rteCallback CALLBACK_OBJECTS={\\\"prosemirror\\\":\\\"XmlFragment\\\"} PORT=1234 node ./node_modules/y-websocket/bin/server.js"
   },
