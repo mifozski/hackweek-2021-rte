@@ -15,7 +15,6 @@ router.post('/rteCallback', function(req, res, next) {
   const noteGuid = req.body && req.body.room;
 
   console.log('noteGuid:', noteGuid)
-  console.log('sessionMap:', sessionMap)
   
   if (noteGuid && sessionMap[noteGuid] && sessionMap[noteGuid].client) {
     const session = sessionMap[noteGuid];
@@ -42,27 +41,22 @@ router.post('/creds', function(req, res, next) {
 
   const { authToken, noteGuid } = req.body;
 
-  const sessionId = `${noteGuid}/${authToken}`;
-  
-  console.error(sessionId)
-
   res.setHeader('Content-Type', 'application/json');
 
   if (sessionMap[noteGuid]) {
-    console.error('existing sessionID', sessionId)
-    return res.end(sessionMap[noteGuid].sessionId);
+    console.error('existing sessionID', noteGuid)
+    return res.end(noteGuid);
   }
   
   const enProvider = initEvernoteProvider(authToken);
   
   sessionMap[noteGuid] = {
     noteGuid: noteGuid,
-    sessionId: sessionId,
     authToken: authToken,
     client: enProvider,
   };
 
-  console.error('new sessionID', sessionId)
+  console.error('new sessionID', noteGuid)
   return res.end(noteGuid);
 });
 
