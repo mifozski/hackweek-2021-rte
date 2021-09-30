@@ -12,20 +12,26 @@ router.get('/', function(req, res, next) {
 router.post('/rteCallback', function(req, res, next) {
   console.error(req.body.room)
 
-  const sessionId = req.body && req.body.room;
-  if (sessionId && sessionMap[sessionId] && session.client && session.noteGuid) {
-    const session = sessionMap[sessionId];
+  const noteGuid = req.body && req.body.room;
+
+  console.log('noteGuid:', noteGuid)
+  console.log('sessionMap:', sessionMap)
+  
+  if (noteGuid && sessionMap[noteGuid] && sessionMap[noteGuid].client) {
+    const session = sessionMap[noteGuid];
+
+    console.log('updating title for ', noteGuid)
 
     var noteStore = session.client.getNoteStore();
 
-    // noteStore.updateNote({
-    //   guid: session.noteGuid,
-    //   title: 'HELLO FROM ANDREY - ' + Date.now().toString(),
-    // }).then(data => {
-    //   console.log(data)
-    // }).catch(e => {
-    //   console.error('error in updateNote: ', e)
-    // })
+    noteStore.updateNote({
+      guid: noteGuid,
+      title: 'HELLO FROM ANDREY - ' + Date.now().toLocaleDateString(),
+    }).then(data => {
+      console.log(data)
+    }).catch(e => {
+      console.error('error in updateNote: ', e)
+    })
   }
 
   res.end();
@@ -36,27 +42,28 @@ router.post('/creds', function(req, res, next) {
 
   const { authToken, noteGuid } = req.body;
 
-  const sessionId = `${noteGuid}-${authToken}`;
+  const sessionId = `${noteGuid}/${authToken}`;
   
   console.error(sessionId)
 
   res.setHeader('Content-Type', 'application/json');
 
-  if (sessionMap[sessionId]) {
+  if (sessionMap[noteGuid]) {
     console.error('existing sessionID', sessionId)
-    return res.end(sessionId);
+    return res.end(sessionMap[noteGuid].sessionId);
   }
   
   const enProvider = initEvernoteProvider(authToken);
   
-  sessionMap[sessionId] = {
+  sessionMap[noteGuid] = {
     noteGuid: noteGuid,
+    sessionId: sessionId,
     authToken: authToken,
     client: enProvider,
   };
 
   console.error('new sessionID', sessionId)
-  return res.end(sessionId);
+  return res.end(noteGuid);
 });
 
 module.exports = router;
